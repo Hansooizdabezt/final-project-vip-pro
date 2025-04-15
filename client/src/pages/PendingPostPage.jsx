@@ -99,14 +99,31 @@ export default function PendingPostPage() {
 
       {post.document && (
         <div className="p-3 max-w-2xl mx-auto w-full">
-          <a
-            href={post.document}
-            className="text-blue-500 underline"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Download attached document
-          </a>
+          <h2 className="text-lg font-semibold mb-2">Attached Document:</h2>
+
+          {/* Hiển thị file với iframe */}
+          <iframe
+            src={`https://docs.google.com/gview?url=${encodeURIComponent(
+              post.document
+            )}&embedded=true`}
+            title="Document Preview"
+            width="100%"
+            height="500px"
+            className="border rounded"
+          ></iframe>
+
+          {/* Link tải về */}
+          <div className="mt-2">
+            <a
+              href={post.document}
+              className="text-blue-500 underline"
+              download
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Download attached document
+            </a>
+          </div>
         </div>
       )}
 

@@ -2,8 +2,13 @@
 import { Modal, Table, Button, Badge } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { HiOutlineExclamationCircle, HiOutlineTrash, HiOutlinePencil } from "react-icons/hi";
+import {
+  HiOutlineExclamationCircle,
+  HiOutlineTrash,
+  HiOutlinePencil,
+} from "react-icons/hi";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function DashMyComments() {
   const { currentUser } = useSelector((state) => state.user);
@@ -36,9 +41,12 @@ export default function DashMyComments() {
   const handleShowMore = async () => {
     const startIndex = userComments.length;
     try {
-      const res = await fetch(`/api/comment/mycomments?startIndex=${startIndex}`, {
-        credentials: "include",
-      });
+      const res = await fetch(
+        `/api/comment/mycomments?startIndex=${startIndex}`,
+        {
+          credentials: "include",
+        }
+      );
       const data = await res.json();
       if (res.ok) {
         setUserComments((prev) => [...prev, ...data.comments]);
@@ -56,15 +64,16 @@ export default function DashMyComments() {
         {
           method: "DELETE",
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-          }
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
         }
       );
-      
+
       if (res.ok) {
         setUserComments((prev) =>
           prev.filter((comment) => comment._id !== commentIdToDelete)
         );
+        toast.success("Comment deleted successfully!");
       }
     } catch (error) {
       console.error("Error deleting comment:", error.message);
@@ -76,8 +85,10 @@ export default function DashMyComments() {
   return (
     <div className="min-h-screen p-6">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-        <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">My Comments</h1>
-        
+        <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">
+          My Comments
+        </h1>
+
         {userComments.length > 0 ? (
           <>
             <div className="overflow-x-auto">
@@ -91,9 +102,14 @@ export default function DashMyComments() {
                 </Table.Head>
                 <Table.Body className="divide-y">
                   {userComments.map((comment) => (
-                    <Table.Row key={comment._id} className="bg-white dark:bg-gray-800">
+                    <Table.Row
+                      key={comment._id}
+                      className="bg-white dark:bg-gray-800"
+                    >
                       <Table.Cell className="whitespace-nowrap">
-                        {new Date(comment.createdAt).toLocaleDateString('vi-VN')}
+                        {new Date(comment.createdAt).toLocaleDateString(
+                          "vi-VN"
+                        )}
                       </Table.Cell>
                       <Table.Cell className="max-w-xs truncate">
                         {comment.content}
@@ -104,8 +120,8 @@ export default function DashMyComments() {
                         </Badge>
                       </Table.Cell>
                       <Table.Cell>
-                        <Link 
-                          to={`/post/${comment.postSlug}`} 
+                        <Link
+                          to={`/post/${comment.postSlug}`}
                           className="text-blue-600 hover:underline"
                         >
                           View Post
@@ -113,10 +129,14 @@ export default function DashMyComments() {
                       </Table.Cell>
                       <Table.Cell>
                         <div className="flex space-x-2">
-                          <Button size="xs" color="failure" onClick={() => {
-                            setShowModal(true);
-                            setCommentIdToDelete(comment._id);
-                          }}>
+                          <Button
+                            size="xs"
+                            color="failure"
+                            onClick={() => {
+                              setShowModal(true);
+                              setCommentIdToDelete(comment._id);
+                            }}
+                          >
                             <HiOutlineTrash className="mr-1" /> Delete
                           </Button>
                         </div>
@@ -140,8 +160,8 @@ export default function DashMyComments() {
             <p className="text-gray-600 dark:text-gray-300">
               You haven&apos;t posted any comments yet. Join the discussion now!
             </p>
-            <Link 
-              to="/search?searchTerm=" 
+            <Link
+              to="/search?searchTerm="
               className="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
               Explore Posts

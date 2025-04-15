@@ -85,7 +85,8 @@ export default function CreatePost() {
       // ✅ Sau khi tạo bài thành công:
       if (data.role === "admin" || data.role === "censor") {
         toast.success("Post created successfully!");
-      } else {
+      }
+      if (data.role === "user") {
         toast.info("Post submitted! Waiting for approval.");
       }
 
@@ -167,16 +168,26 @@ export default function CreatePost() {
         )}
 
         {formData.document && (
-          <div className="w-full h-[500px] mt-4">
-            <iframe
-              title="Uploaded document preview"
-              src={`https://docs.google.com/viewer?url=${encodeURIComponent(
-                formData.document
-              )}&embedded=true`}
-              width="100%"
-              height="100%"
-              className="border"
-            ></iframe>
+          <div className="w-full mt-4 flex flex-col gap-2">
+            <div className="w-full h-[500px]">
+              <iframe
+                title="Uploaded document preview"
+                src={`https://docs.google.com/viewer?url=${encodeURIComponent(
+                  formData.document
+                )}&embedded=true`}
+                width="100%"
+                height="100%"
+                className="border"
+              ></iframe>
+            </div>
+            <Button
+              color="failure"
+              size="sm"
+              className="w-fit"
+              onClick={() => setFormData({ ...formData, document: null })}
+            >
+              Remove Document
+            </Button>
           </div>
         )}
 

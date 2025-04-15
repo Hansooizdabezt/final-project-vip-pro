@@ -180,42 +180,29 @@ export default function UpdatePost() {
         </div>
 
         {/* Upload Document */}
-        <div className="flex flex-col gap-4 border-4 border-blue-500 border-dotted p-3 mt-5">
-          <FileInput
-            type="file"
-            accept=".pdf,.doc,.docx,.txt"
-            onChange={(e) => setDocument(e.target.files[0])}
-          />
-          <Button
-            type="button"
-            gradientDuoTone="cyanToBlue"
-            size="sm"
-            outline
-            onClick={() => handleUpload("document")}
-            disabled={uploadProgress}
-          >
-            {uploadProgress && formData.document ? (
-              <div className="w-16 h-16">
-                <CircularProgressbar
-                  value={uploadProgress}
-                  text={`${uploadProgress || 0}%`}
-                />
-              </div>
-            ) : (
-              "Upload Document"
-            )}
-          </Button>
-          {formData.document && (
-            <div className="mt-4">
-              <p>Uploaded Document:</p>
-              <iframe
-                src={`https://docs.google.com/gview?url=${formData.document}&embedded=true`}
-                style={{ width: "100%", height: "500px" }}
-                frameBorder="0"
-              ></iframe>
-            </div>
-          )}
-        </div>
+        {formData.document && (
+          <div className="mt-4">
+            <p className="mb-2">Uploaded Document:</p>
+            <iframe
+              src={`https://docs.google.com/gview?url=${formData.document}&embedded=true`}
+              style={{ width: "100%", height: "500px" }}
+              frameBorder="0"
+            ></iframe>
+            <Button
+              type="button"
+              color="failure"
+              className="mt-4"
+              onClick={() =>
+                setFormData((prevFormData) => ({
+                  ...prevFormData,
+                  document: "",
+                }))
+              }
+            >
+              Delete Document
+            </Button>
+          </div>
+        )}
 
         <ReactQuill
           theme="snow"

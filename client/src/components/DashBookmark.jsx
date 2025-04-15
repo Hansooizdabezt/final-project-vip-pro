@@ -101,7 +101,17 @@ export default function DashBookmark() {
           )}
         </>
       ) : (
-        <p>You have no bookmarked posts yet.</p>
+        <div className="text-center py-10">
+          <p className="text-gray-600 dark:text-gray-300">
+            You have no post bookmarked. Find some post now !!!
+          </p>
+          <Link
+            to="/"
+            className="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Explore posts
+          </Link>
+        </div>
       )}
     </div>
   );

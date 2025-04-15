@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function DashMyPosts() {
   const { currentUser } = useSelector((state) => state.user);
@@ -14,7 +15,7 @@ export default function DashMyPosts() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const url = `/api/post/getmyposts?userId=${currentUser._id}`; // Lấy bài viết của người dùng hiện tại
+        const url = `/api/post/getmyposts?userId=${currentUser._id}`;
         const res = await fetch(url);
         const data = await res.json();
         if (res.ok) {
@@ -30,7 +31,6 @@ export default function DashMyPosts() {
       }
     };
 
-    // Gọi hàm fetchPosts nếu currentUser đã có thông tin
     if (currentUser) {
       fetchPosts();
     }
@@ -38,7 +38,7 @@ export default function DashMyPosts() {
 
   const handleShowMore = async () => {
     try {
-      const startIndex = userPosts.length; // Chỉ số bắt đầu là độ dài hiện tại của userPosts
+      const startIndex = userPosts.length;
       const url =
         currentUser.role === "admin"
           ? `/api/post/getposts?startIndex=${startIndex}`
@@ -47,9 +47,9 @@ export default function DashMyPosts() {
       const res = await fetch(url);
       const data = await res.json();
       if (res.ok) {
-        setUserPosts((prevPosts) => [...prevPosts, ...data.posts]); // Kết hợp bài viết mới với bài viết cũ
+        setUserPosts((prevPosts) => [...prevPosts, ...data.posts]);
         if (data.posts.length < 9) {
-          setShowMore(false); // Nếu bài viết mới lấy về ít hơn 9, ẩn nút "Show more"
+          setShowMore(false);
         }
       }
     } catch (error) {
@@ -73,6 +73,7 @@ export default function DashMyPosts() {
         setUserPosts((prev) =>
           prev.filter((post) => post._id !== postIdToDelete)
         );
+        toast.success("Post deleted successfully!");
       }
     } catch (error) {
       console.log(error.message);
@@ -81,7 +82,7 @@ export default function DashMyPosts() {
 
   return (
     <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500">
-      {userPosts.length > 0 ? ( // Hiển thị bài viết nếu có
+      {userPosts.length > 0 ? (
         <>
           <Table hoverable className="shadow-md">
             <Table.Head>
@@ -89,8 +90,8 @@ export default function DashMyPosts() {
               <Table.HeadCell>Post image</Table.HeadCell>
               <Table.HeadCell>Post title</Table.HeadCell>
               <Table.HeadCell>Major</Table.HeadCell>
-              <Table.HeadCell>Status</Table.HeadCell> {/* Thêm cột Status */}
-              {userPosts.some((post) => post.status === "pending") ? null : ( // Kiểm tra trạng thái bài viết
+              <Table.HeadCell>Status</Table.HeadCell>
+              {userPosts.some((post) => post.status === "pending") ? null : (
                 <>
                   <Table.HeadCell>Delete</Table.HeadCell>
                   <Table.HeadCell>
@@ -102,7 +103,7 @@ export default function DashMyPosts() {
             <Table.Body className="divide-y">
               {userPosts.map((post) => (
                 <Table.Row
-                  key={post._id} // Đặt key tại đây để đảm bảo React tối ưu hóa rendering
+                  key={post._id}
                   className="bg-white dark:border-gray-700 dark:bg-gray-800"
                 >
                   <Table.Cell>
@@ -123,21 +124,27 @@ export default function DashMyPosts() {
                       <img
                         src={post.image}
                         alt={post.title}
-                        className="w-20 h-10 object-cover bg-gray-500"
+                        className="w-20 h-10 object-cover bg-gray-500 opacity-70 cursor-not-allowed"
                       />
                     )}
                   </Table.Cell>
                   <Table.Cell>
-                    <Link
-                      className="font-medium text-gray-900 dark:text-white"
-                      to={`/post/${post.slug}`}
-                    >
-                      {post.title}
-                    </Link>
+                    {post.status === "approved" ? (
+                      <Link
+                        className="font-medium text-gray-900 dark:text-white"
+                        to={`/post/${post.slug}`}
+                      >
+                        {post.title}
+                      </Link>
+                    ) : (
+                      <span className="font-medium text-gray-500 dark:text-gray-400 cursor-not-allowed">
+                        {post.title}
+                      </span>
+                    )}
                   </Table.Cell>
                   <Table.Cell>{post.category}</Table.Cell>
-                  <Table.Cell>{post.status}</Table.Cell> {/* Hiển thị status */}
-                  {post.status !== "pending" && ( // Chỉ hiển thị cột Delete nếu status không phải là "pending"
+                  <Table.Cell>{post.status}</Table.Cell>
+                  {post.status !== "pending" && (
                     <Table.Cell>
                       <span
                         onClick={() => {
@@ -167,25 +174,24 @@ export default function DashMyPosts() {
           {showMore && (
             <button
               onClick={handleShowMore}
-              className="w-full text-teal-500 self-center text-sm py-7 "
+              className="w-full text-teal-500 self-center text-sm py-7"
             >
               Show more
             </button>
           )}
         </>
       ) : (
-        // Thông báo nếu không có bài viết
         <div className="text-center py-10">
-            <p className="text-gray-600 dark:text-gray-300">
-              You haven no post. Create your post now !!!
-            </p>
-            <Link 
-              to="/create-post" 
-              className="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-              Create posts
-            </Link>
-          </div>
+          <p className="text-gray-600 dark:text-gray-300">
+            You haven no post. Create your post now !!!
+          </p>
+          <Link
+            to="/create-post"
+            className="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Create posts
+          </Link>
+        </div>
       )}
       <Modal
         show={showModal}
